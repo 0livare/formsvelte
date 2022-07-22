@@ -1,0 +1,18 @@
+{
+  "name": "formsvelte",
+  "version": "0.0.1",
+  "description": "A complete form solution for Svelte",
+  "author": "Zach Posten <https://github.com/zposten>",
+  "license": "MIT",
+  "repository": "https://github.com/zposten/formsvelte",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "form",
+    "forms",
+    "svelte",
+    "validation"
+  ]
+}
