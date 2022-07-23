@@ -9,11 +9,12 @@ export type ChangeEvent = Event & {
 }
 
 type FormContextShape<T> = {
-  // register(el: HTMLInputElement)
   isDirty: boolean
   submitCount: number
-  values: T
   initialValues: T
+  values: Partial<Record<keyof T, string>>
+  touched: Partial<Record<keyof T, boolean>>
+  errors: Partial<Record<keyof T, string>>
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
 }
