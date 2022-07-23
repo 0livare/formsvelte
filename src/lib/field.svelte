@@ -1,11 +1,13 @@
 <script lang="ts">
-  import { getFormContext } from './helpers'
+  import { getFormContext, type ChangeEvent } from './helpers'
+  import { debounceFn } from './utils'
 
   export let name: string
 
-  const { register } = getFormContext()
-  let input: HTMLInputElement | null = null
-  $: if (input) register(input)
+  const { handleInput, handleBlur } = getFormContext()
+
+  const debouncedHandleInput = debounceFn(handleInput)
+  const debouncedHandleBlur = debounceFn(handleBlur)
 </script>
 
-<input type="text" bind:this={input} {name} />
+<input type="text" {name} on:input={debouncedHandleInput} on:blur={debouncedHandleBlur} />
