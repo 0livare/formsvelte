@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
-demo/build
-demo/.svelte-kit
+/build
+/.svelte-kit
 .env
 .env.*
 !.env.example
-formsvelte/package
+/package
