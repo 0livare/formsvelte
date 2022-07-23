@@ -1,0 +1,11 @@
+{
+  "name": "demo",
+  "description": "Demo project for formsvelte",
+  "author": "Zach Posten <https://github.com/zposten>",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "formsvelte": "workspace:0.0.1"
+  }
+}
