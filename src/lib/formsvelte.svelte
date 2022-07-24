@@ -8,7 +8,7 @@
   export let initialValues: T
   export let onSubmit: (values: Record<keyof T, string>) => void
 
-  let values = writable<Values<T, string>>({})
+  let values = writable<Values<T, string | boolean>>({})
   let touched = writable<Values<T, boolean>>({})
   let errors = writable<Values<T, string>>({})
   let isDirty = writable(false)
@@ -19,17 +19,41 @@
     const name = target.name as keyof T
     const value = target.value
 
-    console.log('changed', name, 'to', value)
+    values.update((values) => {
+      values[name] = value
+      return values
+    })
 
     const isTouched = readStore(touched)[name]
     if (isTouched) check(name, value)
   }
 
-  function check(name: keyof T, value: string) {
+  function handleBlur(e: Event) {
+    const target = e.target as HTMLInputElement
+    const name = target.name as keyof T
+    const value = target.value
+    check(name, value)
+  }
+
+  function handleChecked(e: Event) {
+    const target = e.target as HTMLInputElement
+    const name = target.name as keyof T
+    const isChecked = target.checked
+
+    values.update((values) => {
+      values[name] = isChecked
+      return values
+    })
+
+    check(name, isChecked)
+  }
+
+  function check(name: keyof T, value: string | boolean) {
     const initialValue = initialValues[name]
 
     touched.update((touched) => {
       touched[name] = value !== (initialValue as unknown as string)
+      console.log('touched', touched)
       return touched
     })
 
@@ -51,13 +75,6 @@
     isDirty.set(touchedVals.reduce((dirty, current) => dirty || current, false))
   }
 
-  function handleBlur(e: Event) {
-    const target = e.target as HTMLInputElement
-    const name = target.name as keyof T
-    const value = target.value
-    check(name, value)
-  }
-
   setFormContext({
     isDirty: readOnly(isDirty),
     submitCount: readOnly(submitCount),
@@ -67,6 +84,7 @@
     initialValues,
     handleInput,
     handleBlur,
+    handleChecked,
   })
 </script>
 

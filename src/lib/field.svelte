@@ -3,8 +3,9 @@
   import { debounceFn } from './utils'
 
   export let name: string
+  export let type = 'text'
 
-  const { handleInput, handleBlur, errors } = getFormContext<any>()
+  const { handleInput, handleBlur, handleChecked, errors } = getFormContext<any>()
 
   $: error = $errors[name]
 
@@ -12,24 +13,38 @@
   const debouncedHandleBlur = debounceFn(handleBlur)
 </script>
 
-<input type="text" {name} on:input={debouncedHandleInput} on:blur={debouncedHandleBlur} />
+<div class="root">
+  <input
+    {type}
+    {name}
+    on:input={type === 'text' ? debouncedHandleInput : undefined}
+    on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
+    on:change={type === 'checkbox' ? handleChecked : undefined}
+  />
 
-{#if error}
-  <p class="error">{error}</p>
-{/if}
+  {#if error}
+    <p class="error">{error}</p>
+  {/if}
+</div>
 
 <style>
+  .root {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid rebeccapurple;
+    padding-top: 64px;
+    padding-left: 64px;
+  }
+
   input {
     background: white;
     border-radius: 4px;
     font-size: 18px;
-    margin-top: 64px;
-    margin-left: 64px;
   }
 
   .error {
     color: red;
     font-weight: 700;
-    margin-left: 64px;
   }
 </style>

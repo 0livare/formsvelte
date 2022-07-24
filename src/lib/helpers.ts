@@ -15,11 +15,12 @@ type FormContextShape<T> = {
   isDirty: Readable<boolean>
   submitCount: Readable<number>
   initialValues: T
-  values: Readable<Values<T, string>>
+  values: Readable<Values<T, string | boolean>>
   touched: Readable<Values<T, boolean>>
   errors: Readable<Values<T, string>>
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
+  handleChecked: (e: Event) => void
 }
 
 export function getFormContext<T>() {
