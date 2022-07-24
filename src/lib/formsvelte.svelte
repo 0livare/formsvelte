@@ -3,12 +3,12 @@
   import type { AnySchema } from 'yup'
 
   import { setFormContext, validateSingleField, type Values } from './helpers'
-  import { readOnly, readStore } from './utils'
+  import { readOnly, readStore, getIn, setInStore, getInStore } from './utils'
 
   type T = $$Generic
 
   export let initialValues: T
-  export let onSubmit: (values: Record<keyof T, string>) => void
+  export let onSubmit: (values: Values<T, string | boolean>) => void
   export let yupSchema: AnySchema | undefined = undefined
 
   let values = writable<Values<T, string | boolean>>({})
@@ -19,45 +19,35 @@
 
   function handleInput(e: Event) {
     const target = e.target as HTMLInputElement
-    const name = target.name as keyof T
+    const name = target.name as string
     const value = target.value
 
-    values.update((values) => {
-      values[name] = value
-      return values
-    })
+    setInStore(values, name, value)
 
-    const isTouched = readStore(touched)[name]
+    const isTouched: boolean = getInStore(touched, name)
     if (isTouched) check(name, value)
   }
 
   function handleBlur(e: Event) {
     const target = e.target as HTMLInputElement
-    const name = target.name as keyof T
+    const name = target.name as string
     const value = target.value
     check(name, value)
   }
 
   function handleChecked(e: Event) {
     const target = e.target as HTMLInputElement
-    const name = target.name as keyof T
+    const name = target.name as string
     const isChecked = target.checked
 
-    values.update((values) => {
-      values[name] = isChecked
-      return values
-    })
-
+    setInStore(values, name, isChecked)
     check(name, isChecked)
   }
 
-  function check(name: keyof T, value: string | boolean) {
-    const initialValue = initialValues[name]
-
-    touched.update((touched) => {
-      touched[name] = value !== (initialValue as unknown as string)
-      return touched
-    })
+  function check(name: string, value: string | boolean) {
+    const initialValue = getIn(initialValues, name)
+    const newValue = value !== (initialValue as unknown as string)
+    setInStore(touched, name, newValue)
 
     if (yupSchema) {
       validateSingleField({
@@ -86,6 +76,7 @@
     handleInput,
     handleBlur,
     handleChecked,
+    handleSubmit,
   })
 </script>
 

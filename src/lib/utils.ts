@@ -30,6 +30,18 @@ export function readOnly<T>(store: Writable<T>) {
   return { subscribe: store.subscribe }
 }
 
+export function getInStore<T>(store: Writable<T>, path: string) {
+  const obj = readStore(store)
+  return getIn(obj, path)
+}
+
+/**
+ * Deeply set a value from an object within a Svelte store via it's path.
+ */
+export function setInStore<T>(store: Writable<T>, path: string, value: any) {
+  store.update((storeVal) => setIn(storeVal, path, value))
+}
+
 //
 //
 // Utils borrowed straight from Formik:
@@ -75,7 +87,7 @@ export function getIn(obj: any, key: string | string[], def?: any, p = 0) {
 }
 
 /**
- * Deeply set a value from in object via it's path. If the value at `path`
+ * Deeply set a value from an object via it's path. If the value at `path`
  * has changed, return a shallow copy of obj with `value` set at `path`.
  * If `value` has not changed, return the original `obj`.
  *

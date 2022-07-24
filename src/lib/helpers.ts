@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte'
 import { type Writable, type Readable } from 'svelte/store'
 import type { AnySchema, ValidationError } from 'yup'
+import { getIn, setIn, setInStore } from './utils'
 
 export const key = Symbol()
 
@@ -22,6 +23,7 @@ type FormContextShape<T> = {
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
   handleChecked: (e: Event) => void
+  handleSubmit: () => void
 }
 
 export function getFormContext<T>() {
@@ -42,10 +44,7 @@ export function validateSingleField<T, V>(args: {
 
   try {
     schema.validateSyncAt(name as string, values)
-    errors.update((errors) => {
-      delete errors[name]
-      return errors
-    })
+    setInStore(errors, name, undefined)
   } catch (e) {
     const err = e as ValidationError
 
@@ -57,18 +56,12 @@ export function validateSingleField<T, V>(args: {
       // Formik's impl here: https://github.com/jaredpalmer/formik/blob/e677bea8181f40e6762fc7e7fb009122384500c6/packages/formik/src/Formik.tsx#L1047
       if (err.inner) {
         if (err.inner.length === 0) {
-          errors.update((errors) => {
-            // @ts-ignore
-            errors[err.path!] = err.message
-            return errors
-          })
+          setInStore(errors, err.path, err.message)
         }
         for (const innerErr of err.inner) {
           errors.update((errors) => {
-            // @ts-ignore
-            if (!errors[innerErr.path]) {
-              // @ts-ignore
-              errors[innerErr.path] = innerErr.message
+            if (!getIn(errors, innerErr.path)) {
+              errors = setIn(errors, innerErr.path, innerErr.message)
             }
             return errors
           })
