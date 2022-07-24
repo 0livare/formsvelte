@@ -42,6 +42,25 @@ export function setInStore<T>(store: Writable<T>, path: string, value: any) {
   store.update((storeVal) => setIn(storeVal, path, value))
 }
 
+/**
+ * Remove any object nested at any depth that is empty
+ * See: https://stackoverflow.com/a/42736367/2517147
+ */
+export function removeEmptyNestedObjects(o) {
+  for (const k in o) {
+    if (!o[k] || typeof o[k] !== 'object') {
+      continue
+    }
+
+    // The property is an object
+    removeEmptyNestedObjects(o[k])
+    if (Object.keys(o[k]).length === 0) {
+      delete o[k]
+    }
+  }
+  return o
+}
+
 //
 //
 // Utils borrowed straight from Formik:

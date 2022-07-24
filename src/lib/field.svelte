@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { getFormContext } from './helpers'
-  import { debounceFn } from './utils'
+  import { getFormContext } from './context'
+  import { debounceFn, getIn, getInStore } from './utils'
 
   export let name: string
   export let type = 'text'
 
   const { handleInput, handleBlur, handleChecked, errors } = getFormContext<any>()
 
-  $: error = $errors[name]
+  $: error = getIn($errors, name)
 
   const debouncedHandleInput = debounceFn(handleInput)
   const debouncedHandleBlur = debounceFn(handleBlur)
