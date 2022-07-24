@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { getFormContext, type ChangeEvent } from './helpers'
+  import { getFormContext } from './helpers'
   import { debounceFn } from './utils'
 
   export let name: string
 
   const { handleInput, handleBlur, errors } = getFormContext<any>()
 
-  let error = errors[name]
+  $: error = $errors[name]
 
   const debouncedHandleInput = debounceFn(handleInput)
   const debouncedHandleBlur = debounceFn(handleBlur)
@@ -30,5 +30,6 @@
   .error {
     color: red;
     font-weight: 700;
+    margin-left: 64px;
   }
 </style>

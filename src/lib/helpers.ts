@@ -1,4 +1,5 @@
 import { getContext, setContext } from 'svelte'
+import { type Readable } from 'svelte/store'
 
 export const key = Symbol()
 
@@ -8,13 +9,15 @@ export type ChangeEvent = Event & {
   checked: boolean
 }
 
+export type Values<T, V> = Partial<Record<keyof T, V>>
+
 type FormContextShape<T> = {
-  isDirty: boolean
-  submitCount: number
+  isDirty: Readable<boolean>
+  submitCount: Readable<number>
   initialValues: T
-  values: Partial<Record<keyof T, string>>
-  touched: Partial<Record<keyof T, boolean>>
-  errors: Partial<Record<keyof T, string>>
+  values: Readable<Values<T, string>>
+  touched: Readable<Values<T, boolean>>
+  errors: Readable<Values<T, string>>
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
 }
