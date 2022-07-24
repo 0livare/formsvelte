@@ -1,5 +1,6 @@
 import { getContext, setContext } from 'svelte'
-import { type Readable } from 'svelte/store'
+import { type Writable, type Readable } from 'svelte/store'
+import type { AnySchema, ValidationError } from 'yup'
 
 export const key = Symbol()
 
@@ -29,4 +30,58 @@ export function getFormContext<T>() {
 
 export function setFormContext<T>(formContext: FormContextShape<T>) {
   setContext(key, formContext)
+}
+
+export function validateSingleField<T, V>(args: {
+  schema: AnySchema
+  name: string
+  values: Values<T, V>
+  errors: Writable<any>
+}) {
+  const { schema, name, values, errors } = args
+
+  try {
+    schema.validateSyncAt(name as string, values)
+    errors.update((errors) => {
+      delete errors[name]
+      return errors
+    })
+  } catch (e) {
+    const err = e as ValidationError
+
+    // Yup will throw a validation error if validation fails. We catch those and
+    // resolve them into Formik errors. We can sniff if something is a Yup error
+    // by checking error.name.
+    // @see https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
+    if (err.name === 'ValidationError') {
+      // Formik's impl here: https://github.com/jaredpalmer/formik/blob/e677bea8181f40e6762fc7e7fb009122384500c6/packages/formik/src/Formik.tsx#L1047
+      if (err.inner) {
+        if (err.inner.length === 0) {
+          errors.update((errors) => {
+            // @ts-ignore
+            errors[err.path!] = err.message
+            return errors
+          })
+        }
+        for (const innerErr of err.inner) {
+          errors.update((errors) => {
+            // @ts-ignore
+            if (!errors[innerErr.path]) {
+              // @ts-ignore
+              errors[innerErr.path] = innerErr.message
+            }
+            return errors
+          })
+        }
+      }
+    } else {
+      // We throw any other errors
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(
+          `Warning: An unhandled error was caught during validation in <Formik validationSchema />`,
+          err,
+        )
+      }
+    }
+  }
 }

@@ -1,12 +1,15 @@
 <script lang="ts">
   import { writable } from 'svelte/store'
-  import { setFormContext, type Values } from './helpers'
+  import type { AnySchema } from 'yup'
+
+  import { setFormContext, validateSingleField, type Values } from './helpers'
   import { readOnly, readStore } from './utils'
 
   type T = $$Generic
 
   export let initialValues: T
   export let onSubmit: (values: Record<keyof T, string>) => void
+  export let yupSchema: AnySchema | undefined = undefined
 
   let values = writable<Values<T, string | boolean>>({})
   let touched = writable<Values<T, boolean>>({})
@@ -53,19 +56,17 @@
 
     touched.update((touched) => {
       touched[name] = value !== (initialValue as unknown as string)
-      console.log('touched', touched)
       return touched
     })
 
-    const hasError = value !== 'zach'
-    errors.update((errors) => {
-      if (hasError) {
-        errors[name] = 'Supposed to be zach'
-      } else {
-        delete errors[name]
-      }
-      return errors
-    })
+    if (yupSchema) {
+      validateSingleField({
+        schema: yupSchema,
+        values: readStore(values),
+        name: name as string,
+        errors,
+      })
+    }
 
     setDirty()
   }
