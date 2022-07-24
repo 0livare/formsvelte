@@ -11,6 +11,8 @@
     setInStore,
     getInStore,
     removeEmptyNestedObjects,
+    setIn,
+    findNested,
   } from './utils'
 
   type T = $$Generic
@@ -48,10 +50,37 @@
   function handleChecked(e: Event) {
     const target = e.target as HTMLInputElement
     const name = target.name as string
+    const value = target.value
     const isChecked = target.checked
+    const initialVal = getIn(initialValues, name)
 
-    setInStore(values, name, isChecked)
+    if (Array.isArray(initialVal)) {
+      let valArray: any[] = getInStore(values, name) ?? []
+      const indexOf = valArray.indexOf(value)
+      const alreadyExists = indexOf >= 0
+      if (isChecked && !alreadyExists) {
+        setInStore(values, name, [...valArray, value])
+      } else if (!isChecked && alreadyExists) {
+        valArray.splice(indexOf, 1)
+        setInStore(values, name, valArray)
+      }
+    } else {
+      setInStore(values, name, isChecked)
+    }
+
     check(name, isChecked)
+  }
+
+  function handleChange(e: Event) {
+    const target = e.target as HTMLInputElement
+    const name = target.name as string
+    const value = target.value
+    const inputType = target.type
+
+    if (inputType === 'radio') {
+      setInStore(values, name, value)
+      check(name, value)
+    }
   }
 
   function handleSubmit(e: SubmitEvent) {
@@ -74,8 +103,8 @@
 
   function check(name: string, value: string | boolean) {
     const initialValue = getIn(initialValues, name)
-    const newValue = value !== (initialValue as unknown as string)
-    setInStore(touched, name, newValue)
+    const hasBeenTouched = value !== (initialValue as unknown as string)
+    setInStore(touched, name, hasBeenTouched)
 
     if (yupSchema) {
       validateSingleFieldWithYup({
@@ -91,8 +120,7 @@
   }
 
   function setDirty() {
-    let touchedVals = Object.values(readStore(touched)) as boolean[]
-    isDirty.set(touchedVals.reduce((dirty, current) => dirty || current, false))
+    isDirty.set(!!findNested(readStore(touched), true))
   }
 
   function setValid() {
@@ -114,6 +142,7 @@
     handleInput,
     handleBlur,
     handleChecked,
+    handleChange,
     handleSubmit,
   })
 </script>

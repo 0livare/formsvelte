@@ -3,11 +3,17 @@
   import { debounceFn, getIn, getInStore } from './utils'
 
   export let name: string
-  export let type = 'text'
+  export let type: 'text' | 'checkbox' | 'radio' = 'text'
+  export let value: string | undefined = undefined
 
-  const { handleInput, handleBlur, handleChecked, errors } = getFormContext<any>()
+  const { handleInput, handleBlur, handleChecked, handleChange, errors, values } =
+    getFormContext<any>()
 
   $: error = getIn($errors, name)
+  $: determinedValue = getIn($values, name) ?? ''
+  $: checkboxChecked = Array.isArray(determinedValue)
+    ? determinedValue.includes(value)
+    : determinedValue
 
   const debouncedHandleInput = debounceFn(handleInput)
   const debouncedHandleBlur = debounceFn(handleBlur)
@@ -17,9 +23,11 @@
   <input
     {type}
     {name}
+    value={value ?? ''}
+    checked={type === 'text' ? undefined : checkboxChecked}
     on:input={type === 'text' ? debouncedHandleInput : undefined}
     on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
-    on:change={type === 'checkbox' ? handleChecked : undefined}
+    on:change={type === 'checkbox' ? handleChecked : type === 'radio' ? handleChange : undefined}
   />
 
   {#if error}

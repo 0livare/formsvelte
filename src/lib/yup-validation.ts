@@ -59,7 +59,7 @@ function convertYupError(args: { error: any; errors: Writable<any> }) {
     // We throw any other errors
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
-        `Warning: An unhandled error was caught during validation in <Formik validationSchema />`,
+        `Warning: An unhandled error was caught during validation in <Formsvelte yupSchema />`,
         err,
       )
     }

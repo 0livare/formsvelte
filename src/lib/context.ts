@@ -16,6 +16,7 @@ type FormContextShape<T> = {
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
   handleChecked: (e: Event) => void
+  handleChange: (e: Event) => void
   handleSubmit: (e: SubmitEvent) => void
 }
 

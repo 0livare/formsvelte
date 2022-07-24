@@ -61,6 +61,21 @@ export function removeEmptyNestedObjects(o) {
   return o
 }
 
+/**
+ * Find a value within an object at any level of nesting
+ * Modified from: https://stackoverflow.com/a/45336438/2517147
+ */
+export function findNested(obj: any, value: string | number | boolean) {
+  if (Object.values(obj).includes(value)) return obj
+
+  for (const key in obj) {
+    if (typeof obj[key] !== 'object') continue
+    const found = findNested(obj[key], value)
+    // If the object was found in the recursive call, bubble it up.
+    if (found) return found
+  }
+}
+
 //
 //
 // Utils borrowed straight from Formik:
