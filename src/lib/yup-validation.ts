@@ -1,13 +1,11 @@
 import type { Writable } from 'svelte/store'
 import type { AnySchema, ValidationError } from 'yup'
 
-import type { Values } from './context'
-
-export function validateSingleFieldWithYup<T, V>(args: {
+export function validateSingleFieldWithYup<T>(args: {
   schema: AnySchema
   name: string
-  values: Values<T, V>
-  errors: Writable<any>
+  values: T
+  errors: Writable<Record<string, string>>
 }) {
   const { schema, name, values, errors } = args
   try {
@@ -25,9 +23,9 @@ export function validateSingleFieldWithYup<T, V>(args: {
   }
 }
 
-export function validateSchemaWithYup<T, V>(args: {
+export function validateSchemaWithYup<T>(args: {
   schema: AnySchema
-  values: Values<T, V>
+  values: T
   errors: Writable<any>
 }) {
   const { schema, values, errors } = args

@@ -2,19 +2,19 @@
   import { writable } from 'svelte/store'
   import type { AnySchema } from 'yup'
 
-  import { setFormContext, type Values } from './context'
+  import { setFormContext } from './context'
   import { validateSchemaWithYup, validateSingleFieldWithYup } from './yup-validation'
   import { readOnly, getIn, setInStore, getInStore, findNested } from './utils'
 
   type T = $$Generic
 
   export let initialValues: T
-  export let onSubmit: (values: Values<T, string | boolean>) => void
+  export let onSubmit: (values: T) => void
   export let yupSchema: AnySchema | undefined = undefined
 
-  let values = writable<Values<T, string | boolean>>({})
-  let touched = writable<Values<T, boolean>>({})
-  let errors = writable<Values<T, string>>({})
+  let values = writable<T>(initialValues)
+  let touched = writable<Record<string, boolean>>({})
+  let errors = writable<Record<string, string>>({})
   let isDirty = writable(false)
   let isValid = writable(true)
   let submitCount = writable(0)
@@ -123,8 +123,8 @@
     isDirty: readOnly(isDirty),
     isValid: readOnly(isValid),
     submitCount: readOnly(submitCount),
-    values: readOnly(values),
-    touched: readOnly(touched),
+    values: values,
+    touched: touched,
     errors: readOnly(errors),
     initialValues,
     handleInput,

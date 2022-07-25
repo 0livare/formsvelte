@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getFormContext } from './context'
-  import { debounceFn, getIn, getInStore } from './utils'
+  import { debounceFn, getIn } from './utils'
 
   export let name: string
   export let type: 'text' | 'checkbox' | 'radio' = 'text'
@@ -11,9 +11,14 @@
   const { handleInput, handleBlur, handleChecked, handleChange, values } = getFormContext<any>()
 
   $: determinedValue = getIn($values, name) ?? ''
-  $: checkboxChecked = Array.isArray(determinedValue)
-    ? determinedValue.includes(value)
-    : determinedValue
+  $: checkboxChecked =
+    type === 'checkbox'
+      ? Array.isArray(determinedValue)
+        ? determinedValue.includes(value)
+        : determinedValue
+      : type === 'radio'
+      ? determinedValue === value
+      : undefined
 
   const debouncedHandleInput = debounceFn(handleInput)
   const debouncedHandleBlur = debounceFn(handleBlur)
@@ -22,8 +27,8 @@
 <input
   {type}
   {name}
-  value={value ?? ''}
-  checked={type === 'text' ? undefined : checkboxChecked}
+  value={type === 'text' ? determinedValue : value ?? ''}
+  checked={checkboxChecked}
   on:input={type === 'text' ? debouncedHandleInput : undefined}
   on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
   on:change={type === 'checkbox' ? handleChecked : type === 'radio' ? handleChange : undefined}

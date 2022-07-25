@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { string, object, boolean, array, number } from 'yup'
+
   import Formsvelte from '$lib/formsvelte.svelte'
   import Field from '$lib/field.svelte'
   import Form from '$lib/form.svelte'
   import Error from '$lib/error.svelte'
-  import { string, object, boolean, array, number } from 'yup'
+  import NameChanger from '../demo/name-changer.svelte'
 
   const schema = object().shape({
     foo: object().shape({
@@ -26,8 +28,8 @@
 </svelte:head>
 
 <Formsvelte
-  initialValues={{ foo: { name: '', terms: false }, flavors: [], scoops: null }}
-  onSubmit={(values) => console.log('Submitted!', values)}
+  initialValues={{ foo: { name: 'kiermo', terms: false }, flavors: [], scoops: null }}
+  onSubmit={(values) => console.info('Submitted!', values)}
   yupSchema={schema}
 >
   <Form>
@@ -79,6 +81,7 @@
       <Error name="flavors" class="error" />
     </div>
 
+    <NameChanger />
     <button>Submit!</button>
   </Form>
 </Formsvelte>
