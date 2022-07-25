@@ -6,12 +6,10 @@
   import { validateSchemaWithYup, validateSingleFieldWithYup } from './yup-validation'
   import {
     readOnly,
-    readStore,
     getIn,
     setInStore,
     getInStore,
     removeEmptyNestedObjects,
-    setIn,
     findNested,
   } from './utils'
 
@@ -35,8 +33,7 @@
 
     setInStore(values, name, value)
 
-    const _submitCount = readStore(submitCount)
-    const isTouched: boolean = _submitCount > 0 || getInStore(touched, name)
+    const isTouched: boolean = $submitCount > 0 || getInStore(touched, name)
     if (isTouched) check(name, value)
   }
 
@@ -88,16 +85,16 @@
     submitCount.update((count) => count + 1)
 
     if (yupSchema) {
-      validateSchemaWithYup({ schema: yupSchema, errors, values })
+      validateSchemaWithYup({ schema: yupSchema, errors, values: $values })
       errors.update((errors) => removeEmptyNestedObjects(errors))
     }
 
-    if (readStore(isValid)) {
-      onSubmit(readStore(values))
+    if ($isValid) {
+      onSubmit($values)
     } else {
       console.warn('Validation failed -- not submitting form')
-      console.warn('isValid: ', readStore(isValid))
-      console.warn('errors: ', readStore(errors))
+      console.warn('isValid: ', $isValid)
+      console.warn('errors: ', $errors)
     }
   }
 
@@ -109,7 +106,7 @@
     if (yupSchema) {
       validateSingleFieldWithYup({
         schema: yupSchema,
-        values: readStore(values),
+        values: $values,
         name: name as string,
         errors,
       })
@@ -120,14 +117,14 @@
   }
 
   function setDirty() {
-    isDirty.set(!!findNested(readStore(touched), true))
+    isDirty.set(!!findNested($touched, true))
   }
 
   function setValid() {
     // This error count won't always be accurate for
     // nested objects, but it's good enough to give
     // a binary answer for isValid
-    const errorCount = Object.keys(readStore(errors)).length
+    const errorCount = Object.keys($errors ?? {}).length
     isValid.set(errorCount === 0)
   }
 

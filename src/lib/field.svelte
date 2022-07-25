@@ -8,8 +8,7 @@
   let className: string | undefined = undefined
   export { className as class }
 
-  const { handleInput, handleBlur, handleChecked, handleChange, errors, values } =
-    getFormContext<any>()
+  const { handleInput, handleBlur, handleChecked, handleChange, values } = getFormContext<any>()
 
   $: determinedValue = getIn($values, name) ?? ''
   $: checkboxChecked = Array.isArray(determinedValue)

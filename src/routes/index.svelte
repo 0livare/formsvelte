@@ -12,7 +12,10 @@
         .required('You forgot this one'),
       terms: boolean().isTrue('Please accept terms').required('Accept my terms or else'),
     }),
-    choice: array().of(string().oneOf(['one', 'three'])),
+    choice: array()
+      .of(string().oneOf(['one', 'three']))
+      .min(1)
+      .required(),
   })
 </script>
 
@@ -27,28 +30,31 @@
   yupSchema={schema}
 >
   <Form>
-    <Field type="text" name="foo.name" class="textbox" />
+    <label for={undefined}>
+      What is your name?
+      <Field type="text" name="foo.name" class="textbox" />
+    </label>
     <Error name="foo.name" class="error" />
-    <Field type="checkbox" name="foo.terms" />
+
+    <label for={undefined}>
+      <Field type="checkbox" name="foo.terms" />
+      Please accept the terms & conditions
+    </label>
     <Error name="foo.terms" class="error" />
 
     <div class="group">
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>
+      <label for={undefined}>
         <Field type="checkbox" name="choice" value="one" />
         One
       </label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>
+      <label for={undefined}>
         <Field type="checkbox" name="choice" value="two" />
         Two
       </label>
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label>
+      <label for={undefined}>
         <Field type="checkbox" name="choice" value="three" />
         Three
       </label>
-
       <Error name="choice" class="error" />
     </div>
 
@@ -65,12 +71,12 @@
     display: flex;
   }
 
-  .error {
+  :global(.error) {
     color: lightcoral;
     font-weight: 700;
   }
 
-  .textbox {
+  :global(.textbox) {
     background: white;
     border-radius: 4px;
     font-size: 18px;

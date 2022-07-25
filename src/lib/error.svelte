@@ -8,7 +8,7 @@
 
   const { errors } = getFormContext<any>()
   $: error = getIn($errors, name)
-  $: console.log('error', error)
+  $: console.log('error', $errors)
 </script>
 
 {#if error}

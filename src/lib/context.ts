@@ -1,9 +1,11 @@
 import { getContext, setContext } from 'svelte'
-import { type Readable } from 'svelte/store'
+import type { Readable } from 'svelte/store'
 
 export const key = Symbol()
 
-export type Values<T, V> = Partial<Record<keyof T, V>>
+export type Values<T, V> = Partial<Record<keyof T, V>> & {
+  subscribe?: never
+}
 
 type FormContextShape<T> = {
   isDirty: Readable<boolean>

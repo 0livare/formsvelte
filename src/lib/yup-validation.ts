@@ -1,6 +1,7 @@
-import { type Writable } from 'svelte/store'
+import type { Writable } from 'svelte/store'
 import type { AnySchema, ValidationError } from 'yup'
-import { type Values } from './context'
+
+import type { Values } from './context'
 import { getIn, setIn, setInStore } from './utils'
 
 export function validateSingleFieldWithYup<T, V>(args: {
@@ -14,7 +15,8 @@ export function validateSingleFieldWithYup<T, V>(args: {
     schema.validateSyncAt(name as string, values)
     setInStore(errors, name, undefined)
   } catch (e) {
-    convertYupError({ error: e, errors })
+    const formErrors = convertYupError(e as Error)
+    setInStore(errors, name, getIn(formErrors, name))
   }
 }
 
@@ -28,40 +30,43 @@ export function validateSchemaWithYup<T, V>(args: {
     schema.validateSync(values, { abortEarly: false })
     errors.set({})
   } catch (e) {
-    convertYupError({ error: e, errors })
+    const formErrors = convertYupError(e as Error)
+    errors.set(formErrors)
   }
 }
 
-function convertYupError(args: { error: any; errors: Writable<any> }) {
-  const { error, errors } = args
-  const err = error as ValidationError
+function convertYupError(e: Error) {
+  let errors = {}
 
   // Yup will throw a validation error if validation fails. We catch those and
   // resolve them into Formik errors. We can sniff if something is a Yup error
   // by checking error.name.
   // @see https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
-  if (err.name === 'ValidationError') {
+  if (e.name === 'ValidationError') {
+    const outerError = e as ValidationError
+    console.log(JSON.stringify(e, null, 2))
+
+    const individualErrors = outerError.inner
+    if (!individualErrors) return {}
+
     // Formik's impl here: https://github.com/jaredpalmer/formik/blob/e677bea8181f40e6762fc7e7fb009122384500c6/packages/formik/src/Formik.tsx#L1047
-    if (err.inner) {
-      if (err.inner.length === 0) {
-        setInStore(errors, err.path, err.message)
-      }
-      for (const innerErr of err.inner) {
-        errors.update((errors) => {
-          if (!getIn(errors, innerErr.path)) {
-            errors = setIn(errors, innerErr.path, innerErr.message)
-          }
-          return errors
-        })
-      }
+    if (outerError.inner.length === 0) {
+      return setIn(errors, outerError.path!, outerError.message)
+    }
+
+    for (const individualError of individualErrors) {
+      if (getIn(errors, individualError.path!)) continue
+      errors = setIn(errors, individualError.path!, individualError.message)
     }
   } else {
     // We throw any other errors
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
         `Warning: An unhandled error was caught during validation in <Formsvelte yupSchema />`,
-        err,
+        e,
       )
     }
   }
+
+  return errors
 }
