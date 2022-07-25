@@ -2,6 +2,7 @@
   import Formsvelte from '$lib/formsvelte.svelte'
   import Field from '$lib/field.svelte'
   import Form from '$lib/form.svelte'
+  import Error from '$lib/error.svelte'
   import { string, object, boolean, array } from 'yup'
 
   const schema = object().shape({
@@ -26,8 +27,10 @@
   yupSchema={schema}
 >
   <Form>
-    <Field type="text" name="foo.name" />
+    <Field type="text" name="foo.name" class="textbox" />
+    <Error name="foo.name" class="error" />
     <Field type="checkbox" name="foo.terms" />
+    <Error name="foo.terms" class="error" />
 
     <div class="group">
       <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -45,6 +48,8 @@
         <Field type="checkbox" name="choice" value="three" />
         Three
       </label>
+
+      <Error name="choice" class="error" />
     </div>
 
     <button>Submit!</button>
@@ -58,5 +63,16 @@
 
   label {
     display: flex;
+  }
+
+  .error {
+    color: lightcoral;
+    font-weight: 700;
+  }
+
+  .textbox {
+    background: white;
+    border-radius: 4px;
+    font-size: 18px;
   }
 </style>
