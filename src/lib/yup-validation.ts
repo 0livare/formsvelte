@@ -44,7 +44,6 @@ function convertYupError(e: Error) {
   // @see https://github.com/jquense/yup#validationerrorerrors-string--arraystring-value-any-path-string
   if (e.name === 'ValidationError') {
     const outerError = e as ValidationError
-    console.log(JSON.stringify(e, null, 2))
 
     const individualErrors = outerError.inner
     if (!individualErrors) return {}

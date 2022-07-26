@@ -20,7 +20,7 @@ export function debounceFn<T>(fn: T, delay = 200): T {
 export function readStore<T>(store: Readable<T>): T {
   let myVar: T | null = null
   store.subscribe((myValue) => (myVar = myValue))
-  return myVar as T
+  return myVar! as T
 }
 
 /**
@@ -46,7 +46,7 @@ export function setInStore<T>(store: Writable<T>, path: string, value: any) {
  * Remove any object nested at any depth that is empty
  * See: https://stackoverflow.com/a/42736367/2517147
  */
-export function removeEmptyNestedObjects(o) {
+export function removeEmptyNestedObjects(o: any) {
   for (const k in o) {
     if (!o[k] || typeof o[k] !== 'object') {
       continue
@@ -64,8 +64,9 @@ export function removeEmptyNestedObjects(o) {
 /**
  * Find a value within an object at any level of nesting
  * Modified from: https://stackoverflow.com/a/45336438/2517147
+ * @returns The parent object that contains the passed `value`
  */
-export function findNested(obj: any, value: string | number | boolean) {
+export function findNested(obj: any, value: string | number | boolean): any {
   if (Object.values(obj).includes(value)) return obj
 
   for (const key in obj) {

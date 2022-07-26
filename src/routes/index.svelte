@@ -3,7 +3,7 @@
   import Field from '$lib/field.svelte'
   import Form from '$lib/form.svelte'
   import Error from '$lib/error.svelte'
-  import { string, object, boolean, array } from 'yup'
+  import { string, object, boolean, array, number } from 'yup'
 
   const schema = object().shape({
     foo: object().shape({
@@ -12,10 +12,11 @@
         .required('You forgot this one'),
       terms: boolean().isTrue('Please accept terms').required('Accept my terms or else'),
     }),
-    choice: array()
-      .of(string().oneOf(['one', 'three']))
+    flavors: array()
+      .of(string().oneOf(['vanilla', 'chocolate']))
       .min(1)
       .required(),
+    scoops: number().min(1).max(3).required(),
   })
 </script>
 
@@ -25,7 +26,7 @@
 </svelte:head>
 
 <Formsvelte
-  initialValues={{ foo: { name: '', terms: false }, choice: [] }}
+  initialValues={{ foo: { name: '', terms: false }, flavors: [], scoops: null }}
   onSubmit={(values) => console.log('Submitted!', values)}
   yupSchema={schema}
 >
@@ -44,18 +45,38 @@
 
     <div class="group">
       <label for={undefined}>
-        <Field type="checkbox" name="choice" value="one" />
+        <Field type="radio" name="scoops" value="1" />
         One
       </label>
       <label for={undefined}>
-        <Field type="checkbox" name="choice" value="two" />
+        <Field type="radio" name="scoops" value="2" />
         Two
       </label>
       <label for={undefined}>
-        <Field type="checkbox" name="choice" value="three" />
+        <Field type="radio" name="scoops" value="3" />
         Three
       </label>
-      <Error name="choice" class="error" />
+      <label for={undefined}>
+        <Field type="radio" name="scoops" value="4" />
+        Four
+      </label>
+      <Error name="scoops" class="error" />
+    </div>
+
+    <div class="group">
+      <label for={undefined}>
+        <Field type="checkbox" name="flavors" value="vanilla" />
+        Vanilla
+      </label>
+      <label for={undefined}>
+        <Field type="checkbox" name="flavors" value="chocolate" />
+        Choclate
+      </label>
+      <label for={undefined}>
+        <Field type="checkbox" name="flavors" value="strawberry" />
+        Strawberry
+      </label>
+      <Error name="flavors" class="error" />
     </div>
 
     <button>Submit!</button>
