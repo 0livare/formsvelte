@@ -67,7 +67,9 @@
     const value = target.value
     const inputType = target.type
 
-    if (inputType === 'radio') {
+    // <select>.type can be 'select-one' or 'select-multiple'
+    // depending on if the multiple attribute is set
+    if (inputType === 'radio' || inputType.startsWith('select')) {
       setInStore(values, name, value)
       check(name, value)
     }
@@ -79,6 +81,7 @@
 
     if (yupSchema) {
       validateSchemaWithYup({ schema: yupSchema, errors, values: $values })
+      setValid()
     }
 
     if ($isValid) {
@@ -115,8 +118,8 @@
   }
 
   function setValid() {
-    const errorCount = Object.keys($errors ?? {}).length
-    isValid.set(errorCount === 0)
+    const errorCount = Object.keys($errors).length
+    $isValid = errorCount === 0
   }
 
   setFormContext({

@@ -3,7 +3,7 @@
   import { debounceFn, getIn } from './utils'
 
   export let name: string
-  export let type: 'text' | 'checkbox' | 'radio' = 'text'
+  export let type: 'text' | 'checkbox' | 'radio' | 'select' = 'text'
   export let value: string | undefined = undefined
   let className: string | undefined = undefined
   export { className as class }
@@ -24,13 +24,19 @@
   const debouncedHandleBlur = debounceFn(handleBlur)
 </script>
 
-<input
-  {type}
-  {name}
-  value={type === 'text' ? determinedValue : value ?? ''}
-  checked={checkboxChecked}
-  on:input={type === 'text' ? debouncedHandleInput : undefined}
-  on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
-  on:change={type === 'checkbox' ? handleChecked : type === 'radio' ? handleChange : undefined}
-  class={className}
-/>
+{#if type === 'select'}
+  <select {name} value={determinedValue} on:change={handleChange} class={className}>
+    <slot />
+  </select>
+{:else}
+  <input
+    {type}
+    {name}
+    value={type === 'text' ? determinedValue : value ?? ''}
+    checked={checkboxChecked}
+    on:input={type === 'text' ? debouncedHandleInput : undefined}
+    on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
+    on:change={type === 'checkbox' ? handleChecked : type === 'radio' ? handleChange : undefined}
+    class={className}
+  />
+{/if}
