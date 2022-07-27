@@ -2,7 +2,6 @@ import type { Writable } from 'svelte/store'
 import type { AnySchema, ValidationError } from 'yup'
 
 import type { Values } from './context'
-import { getIn, setIn, setInStore } from './utils'
 
 export function validateSingleFieldWithYup<T, V>(args: {
   schema: AnySchema
@@ -13,10 +12,16 @@ export function validateSingleFieldWithYup<T, V>(args: {
   const { schema, name, values, errors } = args
   try {
     schema.validateSyncAt(name as string, values)
-    setInStore(errors, name, undefined)
+    errors.update((errors) => {
+      delete errors[name]
+      return errors
+    })
   } catch (e) {
     const formErrors = convertYupError(e as Error)
-    setInStore(errors, name, getIn(formErrors, name))
+    errors.update((errors) => {
+      errors[name] = formErrors[name]
+      return errors
+    })
   }
 }
 
@@ -36,7 +41,7 @@ export function validateSchemaWithYup<T, V>(args: {
 }
 
 function convertYupError(e: Error) {
-  let errors = {}
+  const errors: Record<string, string> = {}
 
   // Yup will throw a validation error if validation fails. We catch those and
   // resolve them into Formik errors. We can sniff if something is a Yup error
@@ -50,12 +55,12 @@ function convertYupError(e: Error) {
 
     // Formik's impl here: https://github.com/jaredpalmer/formik/blob/e677bea8181f40e6762fc7e7fb009122384500c6/packages/formik/src/Formik.tsx#L1047
     if (outerError.inner.length === 0) {
-      return setIn(errors, outerError.path!, outerError.message)
+      setError({ errors, error: outerError })
     }
 
     for (const individualError of individualErrors) {
-      if (getIn(errors, individualError.path!)) continue
-      errors = setIn(errors, individualError.path!, individualError.message)
+      if (errors[individualError.path!]) continue
+      setError({ errors, error: individualError })
     }
   } else {
     // We throw any other errors
@@ -68,4 +73,14 @@ function convertYupError(e: Error) {
   }
 
   return errors
+}
+
+function setError(args: { errors: Record<string, string>; error: ValidationError }) {
+  const { error, errors } = args
+
+  let path = error.path ?? ''
+  const match = path.match(/(.+)\[\d+\]$/)
+  if (match) path = match[1]
+
+  errors[path] = error.message
 }

@@ -4,14 +4,7 @@
 
   import { setFormContext, type Values } from './context'
   import { validateSchemaWithYup, validateSingleFieldWithYup } from './yup-validation'
-  import {
-    readOnly,
-    getIn,
-    setInStore,
-    getInStore,
-    removeEmptyNestedObjects,
-    findNested,
-  } from './utils'
+  import { readOnly, getIn, setInStore, getInStore, findNested } from './utils'
 
   type T = $$Generic
 
@@ -33,7 +26,7 @@
 
     setInStore(values, name, value)
 
-    const isTouched: boolean = $submitCount > 0 || getInStore(touched, name)
+    const isTouched: boolean = $submitCount > 0 || $touched[name]
     if (isTouched) check(name, value)
   }
 
@@ -86,7 +79,6 @@
 
     if (yupSchema) {
       validateSchemaWithYup({ schema: yupSchema, errors, values: $values })
-      errors.update((errors) => removeEmptyNestedObjects(errors))
     }
 
     if ($isValid) {
@@ -101,7 +93,10 @@
   function check(name: string, value: string | boolean) {
     const initialValue = getIn(initialValues, name)
     const hasBeenTouched = value !== (initialValue as unknown as string)
-    setInStore(touched, name, hasBeenTouched)
+    touched.update((touched: any) => {
+      touched[name] = hasBeenTouched
+      return touched
+    })
 
     if (yupSchema) {
       validateSingleFieldWithYup({
@@ -110,7 +105,6 @@
         name: name as string,
         errors,
       })
-      errors.update((errors) => removeEmptyNestedObjects(errors))
       setValid()
     }
     setDirty()
@@ -121,9 +115,6 @@
   }
 
   function setValid() {
-    // This error count won't always be accurate for
-    // nested objects, but it's good enough to give
-    // a binary answer for isValid
     const errorCount = Object.keys($errors ?? {}).length
     isValid.set(errorCount === 0)
   }
