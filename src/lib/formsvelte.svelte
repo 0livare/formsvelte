@@ -125,7 +125,7 @@
     submitCount: readOnly(submitCount),
     values: values,
     touched: touched,
-    errors: readOnly(errors),
+    errors: errors,
     initialValues,
     handleInput,
     handleBlur,

@@ -9,8 +9,8 @@ type FormContextShape<T> = {
   submitCount: Readable<number>
   initialValues: T
   values: Writable<T>
-  touched: Readable<Record<string, boolean>>
-  errors: Readable<Record<string, string>>
+  touched: Writable<Record<string, boolean>>
+  errors: Writable<Record<string, string>>
   handleInput: (e: Event) => void
   handleBlur: (e: Event) => void
   handleChecked: (e: Event) => void
