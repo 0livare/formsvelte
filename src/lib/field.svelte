@@ -3,7 +3,7 @@
   import { debounceFn, getIn } from './utils'
 
   export let name: string
-  export let type: 'text' | 'checkbox' | 'radio' | 'select' = 'text'
+  export let type: 'text' | 'email' | 'password' | 'checkbox' | 'radio' | 'select' = 'text'
   export let value: string | undefined = undefined
   let className: string | undefined = undefined
   export { className as class }
@@ -22,6 +22,10 @@
 
   const debouncedHandleInput = debounceFn(handleInput)
   const debouncedHandleBlur = debounceFn(handleBlur)
+
+  function isTextInput() {
+    return ['text', 'email', 'password'].includes(type)
+  }
 </script>
 
 {#if type === 'select'}
@@ -32,10 +36,10 @@
   <input
     {type}
     {name}
-    value={type === 'text' ? determinedValue : value ?? ''}
+    value={isTextInput() ? determinedValue : value ?? ''}
     checked={checkboxChecked}
-    on:input={type === 'text' ? debouncedHandleInput : undefined}
-    on:blur={type === 'text' ? debouncedHandleBlur : handleBlur}
+    on:input={isTextInput() ? debouncedHandleInput : undefined}
+    on:blur={isTextInput() ? debouncedHandleBlur : handleBlur}
     on:change={type === 'checkbox' ? handleChecked : type === 'radio' ? handleChange : undefined}
     class={className}
   />
