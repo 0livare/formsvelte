@@ -77,7 +77,7 @@
       </label>
       <label for={undefined}>
         <Field type="checkbox" name="flavors" value="chocolate" />
-        Choclate
+        Chocolate
       </label>
       <label for={undefined}>
         <Field type="checkbox" name="flavors" value="strawberry" />

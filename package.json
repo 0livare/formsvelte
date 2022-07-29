@@ -1,6 +1,6 @@
 {
   "name": "formsvelte",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A complete form solution for Svelte",
   "author": "Zach Posten <https://github.com/zposten>",
   "license": "MIT",
@@ -47,6 +47,7 @@
     "form",
     "forms",
     "svelte",
-    "validation"
+    "validation",
+    "formik"
   ]
 }
