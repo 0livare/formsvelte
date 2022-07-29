@@ -20,6 +20,12 @@
       .required(),
     scoops: number().min(1).max(3).required(),
     car: string().oneOf(['mercedes', 'audi']).required(),
+    people: array().of(
+      object().shape({
+        firstName: string().required(),
+        lastName: string().required(),
+      }),
+    ),
   })
 </script>
 
@@ -29,9 +35,16 @@
 </svelte:head>
 
 <Formsvelte
-  initialValues={{ foo: { name: 'kiermo', terms: false }, flavors: [], scoops: null, car: '' }}
+  initialValues={{
+    foo: { name: 'kiermo', terms: false },
+    flavors: [],
+    scoops: null,
+    car: '',
+    people: [{ firstName: '', lastName: '' }],
+  }}
   onSubmit={(values) => console.info('Submitted!', values)}
   yupSchema={schema}
+  let:values
 >
   <Form>
     <div class="group">
@@ -95,6 +108,10 @@
         <option value="audi">Audi</option>
       </Field>
       <Error name="car" class="error" />
+    </div>
+
+    <div class="group">
+      {#each $values.people as person}{/each}
     </div>
 
     <NameChanger />

@@ -2,7 +2,7 @@
   import { writable } from 'svelte/store'
   import type { AnySchema } from 'yup'
 
-  import { setFormContext } from './context'
+  import { setFormContext, type FormContextShape } from './context'
   import { validateSchemaWithYup, validateSingleFieldWithYup } from './yup-validation'
   import { readOnly, getIn, setInStore, getInStore, findNested } from './utils'
 
@@ -122,7 +122,7 @@
     $isValid = errorCount === 0
   }
 
-  setFormContext({
+  const context: FormContextShape<T> = {
     isDirty: readOnly(isDirty),
     isValid: readOnly(isValid),
     submitCount: readOnly(submitCount),
@@ -135,7 +135,22 @@
     handleChecked,
     handleChange,
     handleSubmit,
-  })
+  }
+
+  setFormContext(context)
 </script>
 
-<slot />
+<slot
+  isDirty={context.isDirty}
+  isValid={context.isValid}
+  submitCount={context.submitCount}
+  values={context.values}
+  touched={context.touched}
+  errors={context.errors}
+  initialValues={context.initialValues}
+  handleInput={context.handleInput}
+  handleBlur={context.handleBlur}
+  handleChecked={context.handleChecked}
+  handleChange={context.handleChange}
+  handleSubmit={context.handleSubmit}
+/>

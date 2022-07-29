@@ -3,7 +3,7 @@ import type { Readable, Writable } from 'svelte/store'
 
 export const key = Symbol()
 
-type FormContextShape<T> = {
+export type FormContextShape<T> = {
   isDirty: Readable<boolean>
   isValid: Readable<boolean>
   submitCount: Readable<number>
