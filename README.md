@@ -2,7 +2,10 @@
 
 A complete form solution for Svelte, with an API inspired by [Formik](https://formik.org).
 
-This project is a work in progress.
+This project is a work in progress. Features still to be developed:
+
+- Support for field arrays
+- A mechanism for accessing the `<Formsvelte>` context in the same component in which it is declared
 
 ## Install
 
